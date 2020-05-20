@@ -23,4 +23,25 @@ public class ExtarnalService
 
 
 
+**Configuration**
+
+Configure your MQTT settings in `appSettings.json`
+
+```json
+"BrokerHostSettings": {
+    "Host": "localhost",
+    "Port": 1883
+  },
+
+  "ClientSettings": {
+    "Id": "5eb020f043ba8930506acbdd",
+    "UserName": "rafiul",
+    "Password": "12345678"
+  },
+```
+
+
+
+
+
 **Now do whatever you want to do with `MQTTClientService`!**
