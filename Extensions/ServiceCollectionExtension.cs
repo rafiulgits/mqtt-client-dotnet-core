@@ -38,7 +38,12 @@ namespace Mqtt.Client.AspNetCore.Extensions
             {
                 return serviceProvider.GetService<MqttClientService>();
             });
-
+            services.AddSingleton<MqttClientServiceProvider>(serviceProvider =>
+            {
+                var mqttClientService = serviceProvider.GetService<MqttClientService>();
+                var mqttClientServiceProvider = new MqttClientServiceProvider(mqttClientService);
+                return mqttClientServiceProvider;
+            });
             return services;
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mqtt.Client.AspNetCore.Extensions;
+using Mqtt.Client.AspNetCore.Services;
 using Mqtt.Client.AspNetCore.Settings;
 
 namespace Mqtt.Client.AspNetCore
@@ -46,6 +47,7 @@ namespace Mqtt.Client.AspNetCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMqttClientHostedService();
+            services.AddSingleton<ExtarnalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

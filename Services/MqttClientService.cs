@@ -1,28 +1,69 @@
-﻿using Microsoft.Extensions.Hosting;
-using Mqtt.Client.AspNetCore.Client;
+﻿using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Client.Connecting;
+using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mqtt.Client.AspNetCore.Services
 {
-    public class MqttClientService : IHostedService
+    public class MqttClientService : IMqttClientService
     {
-        private AspMqttClient Client;
+        private IMqttClient mqttClient;
+        private IMqttClientOptions options;
 
         public MqttClientService(IMqttClientOptions options)
         {
-            Client = new AspMqttClient(options);
+            this.options = options;
+            mqttClient = new MqttFactory().CreateMqttClient();
+            ConfigureMqttClient();
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        private void ConfigureMqttClient()
         {
-            return Client.StartClientAsync();
+            mqttClient.ConnectedHandler = this;
+            mqttClient.DisconnectedHandler = this;
+            mqttClient.ApplicationMessageReceivedHandler = this;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
-            return Client.StopClientAsync();
+            throw new System.NotImplementedException();
+        }
+
+        public async Task HandleConnectedAsync(MqttClientConnectedEventArgs eventArgs)
+        {
+            System.Console.WriteLine("connected");
+            await mqttClient.SubscribeAsync("hello/world");
+        }
+
+        public Task HandleDisconnectedAsync(MqttClientDisconnectedEventArgs eventArgs)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await mqttClient.ConnectAsync(options);
+            if (!mqttClient.IsConnected)
+            {
+                await mqttClient.ReconnectAsync();
+            }
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if(cancellationToken.IsCancellationRequested)
+            {
+                var disconnectOption = new MqttClientDisconnectOptions
+                {
+                    ReasonCode = MqttClientDisconnectReason.NormalDisconnection,
+                    ReasonString = "NormalDiconnection"
+                };
+                await mqttClient.DisconnectAsync(disconnectOption, cancellationToken);
+            }
+            await mqttClient.DisconnectAsync();
         }
     }
 }
