@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Mqtt.Client.AspNetCore.Options;
 using Mqtt.Client.AspNetCore.Services;
 using Mqtt.Client.AspNetCore.Settings;
-using MQTTnet.Client.Options;
+using MQTTnet.Client;
 using System;
 
 namespace Mqtt.Client.AspNetCore.Extensions
@@ -25,11 +24,11 @@ namespace Mqtt.Client.AspNetCore.Extensions
             return services;
         }
 
-        private static IServiceCollection AddMqttClientServiceWithConfig(this IServiceCollection services, Action<AspCoreMqttClientOptionBuilder> configure)
+        private static IServiceCollection AddMqttClientServiceWithConfig(this IServiceCollection services, Action<MqttClientOptionsBuilder> configure)
         {
-            services.AddSingleton<IMqttClientOptions>(serviceProvider =>
+            services.AddSingleton<MqttClientOptions>(serviceProvider =>
             {
-                var optionBuilder = new AspCoreMqttClientOptionBuilder(serviceProvider);
+                var optionBuilder = new MqttClientOptionsBuilder();
                 configure(optionBuilder);
                 return optionBuilder.Build();
             });
